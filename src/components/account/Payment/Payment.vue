@@ -2,6 +2,7 @@
     <div>
         <div class="max-w-lg mx-auto">
             <h3 class="text-3xl pt-5 pb-5">Enter Details</h3>
+            <p class="pb-6 text-lg">Amount to pay: £5.99</p>
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="card-number">
                 Card Number
             </label>
@@ -15,12 +16,24 @@
             </label>
             <div id="cvv" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white h-20 mb-5" ></div>
 
-            <div v-if="error !== null" class="bg-red-100 border-l-4 border-red-500 text-orange-700 p-4 mb-5" role="alert">
+            <div v-if="error !== null" class="bg-red-100 border-l-4 border-red-500 text-orange-700 p-4 mb-6" role="alert">
                 <p class="font-bold">Be Warned</p>
                 <div class="alert alert-danger">{{ error.message }}</div>
             </div>
 
-            <button class="bg-blue-500 text-white font-bold py-4 px-6 rounded" @click.prevent="submitPayment" v-if="!isValidated">Submit Payment</button>
+            <div v-if="transactionData !== null" class="max-w-lg mx-auto mt-10">
+                <div role="alert">
+                    <div class="bg-green-500 text-white font-bold rounded-t px-4 py-2">
+                        Successful payment info
+                    </div>
+                    <div class="border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700 mb-6">
+                        <p class="pb-3">Your payment has been accepted!</p>
+                        <p>Transaction ID: <b>{{ transactionData.transaction_id }}</b></p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="bg-blue-500 text-white font-bold py-4 px-6 rounded" @click.prevent="submitPaymentButton" v-if="!isValidated">Submit Payment</button>
         </div>
     </div>
 </template>
@@ -39,6 +52,8 @@ export default {
     data() {
         return {
             error: null,
+            amount: 5.99,
+            transactionData: null,
             hostedFieldsInstance: false
         }
     },
@@ -89,19 +104,14 @@ export default {
                     return braintree.hostedFields.create(formOptions);
                 })
                 .then(hostedFieldsInstance => {
-                    console.log(hostedFieldsInstance.nonce);
                     this.hostedFieldsInstance = hostedFieldsInstance;
                 })
                 .catch(error => {
-                    console.log(error);
                     if (typeof error.message !== 'undefined') {
                         this.error = error;
                     } else {
                         this.error = "An error occurred while processing the payment.";
                     }
-                })
-                .finally(() => {
-                    this.$emit("loaded", true);
                 })
         },
 
@@ -110,16 +120,12 @@ export default {
          */
         async submitPaymentButton() {
             this.error = null;
-
+            this.transactionData = null;
             await this.hostedFieldsInstance.tokenize()
                 .then(response => {
-                    console.log(response);
-                    console.log(response.nonce);
-
                     this.submitPayment(response);
                 })
                 .catch(error => {
-                    console.error(error);
                     this.error = error;
                 })
         },
@@ -129,10 +135,11 @@ export default {
          */
         async submitPayment(response) {
             await axios.post("api/payments", {
-                nonce: response.nonce
+                nonce: response.nonce,
+                amount: this.amount,
             })
                 .then(response => {
-                    console.log(response);
+                    this.transactionData = response.data.data;
                 })
                 .catch(error => {
                     console.error(error);

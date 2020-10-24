@@ -6,7 +6,6 @@ import Login from "@/views/auth/Login";
 import Register from "@/views/auth/Register";
 import AuthMiddleware from '@/middleware/AuthMiddleware'
 import Payment from "@/components/account/Payment/Payment";
-import PaymentSuccess from "@/components/account/Payment/Success";
 import IsLoggedInMiddleware from "@/middleware/IsLoggedInMiddleware";
 
 Vue.use(VueRouter)
@@ -40,11 +39,6 @@ Vue.use(VueRouter)
         path: 'payment',
         name: 'Payment',
         component: Payment,
-      },
-      {
-        path: 'payment-success',
-        name: 'PaymentSuccess',
-        component: PaymentSuccess
       },
     ]
   },
