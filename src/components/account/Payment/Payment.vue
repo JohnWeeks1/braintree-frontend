@@ -100,6 +100,9 @@ export default {
                         this.error = "An error occurred while processing the payment.";
                     }
                 })
+                .finally(() => {
+                    this.$emit("loaded", true);
+                })
         },
 
         /**

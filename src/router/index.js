@@ -6,8 +6,8 @@ import Login from "@/views/auth/Login";
 import Register from "@/views/auth/Register";
 import AuthMiddleware from '@/middleware/AuthMiddleware'
 import Payment from "@/components/account/Payment/Payment";
-import AccountMiddleware from "@/middleware/AccountMiddleware";
 import PaymentSuccess from "@/components/account/Payment/Success";
+import IsLoggedInMiddleware from "@/middleware/IsLoggedInMiddleware";
 
 Vue.use(VueRouter)
 
@@ -15,19 +15,19 @@ Vue.use(VueRouter)
   {
     path: '',
     name: 'Welcome',
-    beforeEnter: AccountMiddleware,
+    beforeEnter: IsLoggedInMiddleware,
     component: Welcome,
   },
   {
     path: '/login',
     name: 'Login',
-    beforeEnter: AccountMiddleware,
+    beforeEnter: IsLoggedInMiddleware,
     component: Login
   },
   {
     path: '/register',
     name: 'Register',
-    beforeEnter: AccountMiddleware,
+    beforeEnter: IsLoggedInMiddleware,
     component: Register,
   },
   {

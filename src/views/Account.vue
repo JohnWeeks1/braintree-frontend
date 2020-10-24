@@ -12,7 +12,7 @@ import Nav from "@/components/structure/Nav";
 export default {
     name: 'Account',
     components: {
-        Nav
-    }
+        Nav,
+    },
 };
 </script>
