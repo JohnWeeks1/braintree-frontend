@@ -4,7 +4,7 @@
             <div class="flex items-center flex-shrink-0 text-white mr-6">
                 <span class="font-semibold text-xl tracking-tight">You're logged in!</span>
             </div>
-            <div class="block lg:hidden">
+            <div class="block">
                 <button @click="logout" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     {{ user.firstName }}, Logout
                 </button>
@@ -33,6 +33,9 @@ export default {
                 .then(() => {
                     this.$router.push({ name: 'Welcome'})
                 })
+            .catch(error => {
+                console.error(error);
+            })
         }
     }
 }

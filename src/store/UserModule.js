@@ -38,7 +38,6 @@ export default {
         async fetchUser({commit}) {
              await axios.get('api/users')
                 .then(response => {
-                    console.log('hello');
                     commit('updateId', response.data.data.id);
                     commit('updateFirstName', response.data.data.firstname);
                     commit('updateLastName', response.data.data.lastname);
@@ -46,7 +45,7 @@ export default {
                     commit('updateIsLoggedIn', true);
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(error);
                 })
         },
         async logout({commit}){
@@ -57,7 +56,7 @@ export default {
                     commit('updateIsLoggedIn', false);
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error(error);
                 })
         },
     },
