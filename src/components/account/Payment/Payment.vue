@@ -35,7 +35,7 @@ import axios from 'axios';
 import braintree from 'braintree-web';
 
 export default {
-    name: 'BrainTree',
+    name: 'Payment',
     data() {
         return {
             error: null,

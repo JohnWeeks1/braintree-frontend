@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Welcome from "@/views/Welcome"
-import AuthMiddleware from '@/middleware/AuthMiddleware'
+import Account from "@/views/Account";
 import Login from "@/views/auth/Login";
 import Register from "@/views/auth/Register";
-import Account from "@/views/Account";
-import Payment from "@/components/account/Payment";
-import PaymentSuccess from "@/components/account/PaymentSuccess";
+import AuthMiddleware from '@/middleware/AuthMiddleware'
+import Payment from "@/components/account/Payment/Payment";
+import AccountMiddleware from "@/middleware/AccountMiddleware";
+import PaymentSuccess from "@/components/account/Payment/Success";
 
 Vue.use(VueRouter)
 
@@ -14,16 +15,19 @@ Vue.use(VueRouter)
   {
     path: '',
     name: 'Welcome',
+    beforeEnter: AccountMiddleware,
     component: Welcome,
   },
   {
     path: '/login',
     name: 'Login',
+    beforeEnter: AccountMiddleware,
     component: Login
   },
   {
     path: '/register',
     name: 'Register',
+    beforeEnter: AccountMiddleware,
     component: Register,
   },
   {
@@ -35,7 +39,7 @@ Vue.use(VueRouter)
       {
         path: 'payment',
         name: 'Payment',
-        component: Payment
+        component: Payment,
       },
       {
         path: 'payment-success',
