@@ -13,7 +13,7 @@ const vuexLocal = new VuexPersistence({
 
 export default new Vuex.Store({
   modules: {
-    user: UserModule,
+    user : UserModule
   },
   plugins: [vuexLocal.plugin]
 });

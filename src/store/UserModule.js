@@ -6,8 +6,7 @@ const getDefaultState = () => {
         firstName: null,
         lastName: null,
         email: null,
-        isLoggedIn: false,
-        isSubscribed: false,
+        isLoggedIn: false
     }
 };
 
@@ -48,6 +47,7 @@ export default {
                     console.error(error);
                 })
         },
+
         async logout({commit}){
             await axios.post('api/logout')
                 .then(() => {

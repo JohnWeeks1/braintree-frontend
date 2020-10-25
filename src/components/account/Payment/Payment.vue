@@ -128,6 +128,9 @@ export default {
                 .catch(error => {
                     this.error = error;
                 })
+                .finally(() => {
+                    this.$store.dispatch('page/isLoaded');
+                })
         },
 
         /**

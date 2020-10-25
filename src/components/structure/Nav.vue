@@ -6,7 +6,7 @@
             </div>
             <div class="block">
                 <button @click="logout" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    {{ user.firstName }}, Logout
+                    {{ firstName }}, Logout
                 </button>
             </div>
         </nav>
@@ -19,13 +19,11 @@ export default {
     name: 'Nav',
     data() {
         return {
-            user: {
-                firstName: null
-            }
+            firstName: null
         }
     },
     mounted() {
-        this.user.firstName = this.$store.getters['user/getFirstName'];
+        this.firstName = this.$store.getters['user/getFirstName'];
     },
     methods: {
         logout() {
