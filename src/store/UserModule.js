@@ -6,6 +6,8 @@ const getDefaultState = () => {
         firstName: null,
         lastName: null,
         email: null,
+        cardType: null,
+        cardLastFour: null,
         isLoggedIn: false
     }
 };
@@ -29,6 +31,12 @@ export default {
         updateEmail(state, payload) {
             state.email = payload
         },
+        updateCardType(state, payload) {
+            state.cardType = payload
+        },
+        updateCardLastFour(state, payload) {
+            state.cardLastFour = payload
+        },
         updateIsLoggedIn(state, payload) {
             state.isLoggedIn = payload
         },
@@ -38,9 +46,11 @@ export default {
              await axios.get('api/users')
                 .then(response => {
                     commit('updateId', response.data.data.id);
-                    commit('updateFirstName', response.data.data.firstname);
-                    commit('updateLastName', response.data.data.lastname);
+                    commit('updateFirstName', response.data.data.first_name);
+                    commit('updateLastName', response.data.data.last_name);
                     commit('updateEmail', response.data.data.email);
+                    commit('updateCardType', response.data.data.cardType);
+                    commit('updateCardLastFour', response.data.data.cardLastFour);
                     commit('updateIsLoggedIn', true);
                 })
                 .catch(error => {
@@ -68,6 +78,10 @@ export default {
         getLastName: state => state.lastName,
 
         getEmail: state => state.email,
+
+        getCardType: state => state.cardType,
+
+        getCardLastFour: state => state.cardLastFour,
 
         getIsLoggedIn: state => state.isLoggedIn,
     }

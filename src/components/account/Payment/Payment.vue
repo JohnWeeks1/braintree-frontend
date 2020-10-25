@@ -3,32 +3,31 @@
         <div class="max-w-lg mx-auto">
             <h3 class="text-3xl pt-5 pb-5">Enter Details</h3>
             <p class="pb-6 text-lg">Amount to pay: £5.99</p>
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="card-number">
+            <label class="hostedFieldLabel" for="card-number">
                 Card Number
             </label>
-            <div id="card-number" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white h-20" ></div>
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="card-number">
+            <div id="card-number" class="hostedField focus:outline-none focus:bg-white"></div>
+            <label class="hostedFieldLabel" for="card-number">
                 Expiration Date
             </label>
-            <div id="expiration-date" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white h-20" ></div>
-            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="card-number">
+            <div id="expiration-date" class="hostedField focus:outline-none focus:bg-white" ></div>
+            <label class="hostedFieldLabel" for="card-number">
                 CVV
             </label>
-            <div id="cvv" class="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white h-20 mb-5" ></div>
+            <div id="cvv" class="hostedField focus:outline-none focus:bg-white" ></div>
 
             <div v-if="error !== null" class="bg-red-100 border-l-4 border-red-500 text-orange-700 p-4 mb-6" role="alert">
                 <p class="font-bold">Be Warned</p>
                 <div class="alert alert-danger">{{ error.message }}</div>
             </div>
 
-            <div v-if="transactionData !== null" class="max-w-lg mx-auto mt-10">
+            <div v-if="success" class="max-w-lg mx-auto mt-10">
                 <div role="alert">
                     <div class="bg-green-500 text-white font-bold rounded-t px-4 py-2">
                         Successful payment info
                     </div>
                     <div class="border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700 mb-6">
                         <p class="pb-3">Your payment has been accepted!</p>
-                        <p>Transaction ID: <b>{{ transactionData.transaction_id }}</b></p>
                     </div>
                 </div>
             </div>
@@ -53,7 +52,7 @@ export default {
         return {
             error: null,
             amount: 5.99,
-            transactionData: null,
+            success: false,
             hostedFieldsInstance: false
         }
     },
@@ -66,7 +65,7 @@ export default {
          * Initialize Braintree
          */
         initBraintree() {
-            braintree.client.create({authorization: 'sandbox_pgfdy57x_r7szh49z3pjxfmgz'})
+            braintree.client.create({authorization: 'sandbox_x6sh3r8z_fy3w4pn4t44sy5mb'})
                 .then(clientInstance => {
                     let formOptions = {
                         client: clientInstance,
@@ -120,7 +119,7 @@ export default {
          */
         async submitPaymentButton() {
             this.error = null;
-            this.transactionData = null;
+
             await this.hostedFieldsInstance.tokenize()
                 .then(response => {
                     this.submitPayment(response);
@@ -128,27 +127,26 @@ export default {
                 .catch(error => {
                     this.error = error;
                 })
-                .finally(() => {
-                    this.$store.dispatch('page/isLoaded');
-                })
         },
 
         /**
          * Submit payment
          */
         async submitPayment(response) {
+            this.success = false;
+
             await axios.post("api/payments", {
                 nonce: response.nonce,
                 amount: this.amount,
             })
-                .then(response => {
-                    this.transactionData = response.data.data;
-                })
-                .catch(error => {
-                    console.error(error);
-                    this.error = error;
-                })
-        }
+            .then(() => {
+                this.success = true;
+            })
+            .catch(error => {
+                console.log(error);
+                this.error = error;
+            })
+        },
     },
     computed: {
         isValidated() {
@@ -181,7 +179,7 @@ export default {
             }
 
             return false;
-        }
+        },
     },
 }
 </script>

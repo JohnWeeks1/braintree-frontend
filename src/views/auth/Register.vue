@@ -76,8 +76,8 @@ export default {
                 });
 
             await axios.post('api/register', {
-                firstname: this.firstName,
-                lastname: this.lastName,
+                first_name: this.firstName,
+                last_name: this.lastName,
                 email: this.email,
                 password: this.password,
                 password_confirmation: this.password_confirmation

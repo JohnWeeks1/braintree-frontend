@@ -6,7 +6,7 @@ import UserModule from "@/store/UserModule";
 Vue.use(Vuex);
 
 const vuexLocal = new VuexPersistence({
-  key: 'braintree-app',
+  key: 'braintree',
   storage: window.localStorage,
 });
 
