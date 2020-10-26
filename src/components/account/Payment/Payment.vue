@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="p-6">
         <div class="max-w-lg mx-auto">
             <h3 class="text-3xl pt-5 pb-5">Enter Details</h3>
             <p class="pb-6 text-lg">Amount to pay: £5.99</p>
@@ -7,14 +7,20 @@
                 Card Number
             </label>
             <div id="card-number" class="hostedField focus:outline-none focus:bg-white"></div>
-            <label class="hostedFieldLabel" for="card-number">
-                Expiration Date
-            </label>
-            <div id="expiration-date" class="hostedField focus:outline-none focus:bg-white" ></div>
-            <label class="hostedFieldLabel" for="card-number">
-                CVV
-            </label>
-            <div id="cvv" class="hostedField focus:outline-none focus:bg-white" ></div>
+            <div class="flex">
+                <div class="mr-1">
+                    <label class="hostedFieldLabel" for="card-number">
+                        Expiration Date
+                    </label>
+                    <div id="expiration-date" class="hostedField focus:outline-none focus:bg-white" ></div>
+                </div>
+                <div class="ml-1">
+                    <label class="hostedFieldLabel" for="card-number">
+                        CVV
+                    </label>
+                    <div id="cvv" class="hostedField focus:outline-none focus:bg-white" ></div>
+                </div>
+            </div>
 
             <DangerAlert :error="error"/>
             <SuccessAlert v-if="success"/>
