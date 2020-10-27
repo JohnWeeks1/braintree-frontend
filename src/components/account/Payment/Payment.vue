@@ -1,5 +1,6 @@
 <template>
     <div class="p-6">
+
         <div class="max-w-lg mx-auto">
             <h3 class="text-3xl pt-5 pb-5">Enter Details</h3>
             <p class="pb-6 text-lg">Amount to pay: £5.99</p>
@@ -25,7 +26,11 @@
             <DangerAlert :error="error"/>
             <SuccessAlert v-if="success"/>
 
+            <h1 class="text-lg">Other Payment Options</h1>
+
             <button class="bg-blue-500 text-white font-bold py-4 px-6 rounded" @click.prevent="submitPaymentButton" v-if="!isValidated">Submit Payment</button>
+
+            <div id="paypal-button"></div>
         </div>
     </div>
 </template>
@@ -38,6 +43,7 @@
 
 import axios from 'axios';
 import braintree from 'braintree-web';
+import paypal from 'paypal-checkout';
 import DangerAlert from "@/components/partials/alerts/DangerAlert";
 import SuccessAlert from "@/components/partials/alerts/SuccessAlert";
 
@@ -53,6 +59,7 @@ export default {
     },
     mounted() {
         this.initBraintree();
+        this.initPaypal();
     },
     methods: {
 
@@ -107,6 +114,62 @@ export default {
                         this.error = "An error occurred while processing the payment.";
                     }
                 })
+        },
+
+        /**
+         * Initialize Paypal
+         */
+        initPaypal() {
+            braintree.client.create({ authorization: process.env.VUE_APP_BRAINTREE_SANDBOX_KEY })
+                .then(function (clientInstance) {
+                return braintree.paypalCheckout.create({
+                    client: clientInstance
+                });
+            }).then(function (paypalInstance) {
+                return paypal.Button.render({
+                    env: 'sandbox',
+                    style: {
+                        label: 'paypal',
+                        size: 'responsive',
+                        shape: 'rect'
+                    },
+                    payment: () => {
+                        return paypalInstance.createPayment({
+                            flow: 'checkout',
+                            intent: 'sale',
+                            amount: 10.00,
+                            displayName: 'Braintree Testing',
+                            currency: 'USD'
+                        })
+                    },
+                    onAuthorize: (data, options) => {
+                        return paypalInstance.tokenizePayment(options)
+                            .then(response => {
+                                // this.error = "";
+                                axios.post("api/payments", {
+                                    nonce: response.nonce,
+                                    amount: 10.00,
+                                })
+                                    .then(() => {
+                                        this.success = true;
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                    })
+                            })
+                    },
+                    // onCancel: (data) => {
+                    //     console.log(data);
+                    //     console.log("Payment Cancelled");
+                    // },
+                    // onError: (err) => {
+                    //     console.error(err);
+                    //     this.error = "An error occurred while processing the paypal payment.";
+                    // }
+                }, '#paypal-button')
+            }).catch(function (err) {
+                console.error('Error!', err);
+            });
         },
 
         /**

@@ -12,6 +12,7 @@
     "axios": "^0.20.0",
     "braintree-web": "^3.68.0",
     "core-js": "^3.6.5",
+    "paypal-checkout": "^4.0.318",
     "tailwindcss": "^1.9.6",
     "vue": "^2.6.11",
     "vue-horizontal-list": "^1.0.12",
