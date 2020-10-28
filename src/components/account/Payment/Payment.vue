@@ -1,247 +1,30 @@
 <template>
-    <div class="p-6">
+    <div>
+        <div class="pt-6 pb-3">
+            <div @click="show = !show" class="max-w-lg mx-auto bg-blue-500 hover:bg-blue-700 text-white text-lg py-3 text-center font-bold py-2 px-4 rounded cursor-pointer">Card Payment</div>
+            <CardPayment v-if="show"/>
+        </div>
 
-        <div class="max-w-lg mx-auto">
-            <h3 class="text-3xl pt-5 pb-5">Enter Details</h3>
-            <p class="pb-6 text-lg">Amount to pay: £5.99</p>
-            <label class="hostedFieldLabel" for="card-number">
-                Card Number
-            </label>
-            <div id="card-number" class="hostedField focus:outline-none focus:bg-white"></div>
-            <div class="flex">
-                <div class="mr-1">
-                    <label class="hostedFieldLabel" for="card-number">
-                        Expiration Date
-                    </label>
-                    <div id="expiration-date" class="hostedField focus:outline-none focus:bg-white" ></div>
-                </div>
-                <div class="ml-1">
-                    <label class="hostedFieldLabel" for="card-number">
-                        CVV
-                    </label>
-                    <div id="cvv" class="hostedField focus:outline-none focus:bg-white" ></div>
-                </div>
-            </div>
-
-            <DangerAlert :error="error"/>
-            <SuccessAlert v-if="success"/>
-
-            <h1 class="text-lg">Other Payment Options</h1>
-
-            <button class="bg-blue-500 text-white font-bold py-4 px-6 rounded" @click.prevent="submitPaymentButton" v-if="!isValidated">Submit Payment</button>
-
-            <div id="paypal-button"></div>
+        <div v-if="!show" class="py-4">
+            <Paypal/>
         </div>
     </div>
 </template>
 
 <script>
-//REFERENCES
-//https://rojas.io/how-to-use-braintree-paypal-with-vue-js/
-//https://github.com/leorojas22/braintree-vuejs/blob/master/src/App.vue
-//https://developers.braintreepayments.com/start/overview#how-it-works
-
-import axios from 'axios';
-import braintree from 'braintree-web';
-import paypal from 'paypal-checkout';
-import DangerAlert from "@/components/partials/alerts/DangerAlert";
-import SuccessAlert from "@/components/partials/alerts/SuccessAlert";
+import Paypal from "@/components/account/Payment/Portails/Paypal";
+import CardPayment from "@/components/account/Payment/Portails/CardPayment";
 
 export default {
     name: 'Payment',
     data() {
         return {
-            error: null,
-            amount: 5.99,
-            success: false,
-            hostedFieldsInstance: false
+            show: false
         }
     },
-    mounted() {
-        this.initBraintree();
-        this.initPaypal();
-    },
-    methods: {
-
-        /**
-         * Initialize Braintree
-         */
-        initBraintree() {
-            braintree.client.create({ authorization: process.env.VUE_APP_BRAINTREE_SANDBOX_KEY })
-                .then(clientInstance => {
-                    let formOptions = {
-                        client: clientInstance,
-                        styles: {
-                            'input': {
-                                'font-size': '16px',
-                                'color': '#3A3A3A'
-                            },
-                            '.number': {
-                                'font-family': 'monospace'
-                            },
-                            '.valid': {
-                                'color': 'green'
-                            },
-                            '.invalid': {
-                                'color': 'red'
-                            }
-                        },
-                        fields: {
-                            number: {
-                                selector: '#card-number',
-                                placeholder: '1234 1234 1234 1234'
-                            },
-                            expirationDate: {
-                                selector: '#expiration-date',
-                                placeholder: '09/23'
-                            },
-                            cvv: {
-                                selector: '#cvv',
-                                placeholder: '123'
-                            }
-                        }
-                    }
-
-                    return braintree.hostedFields.create(formOptions);
-                })
-                .then(hostedFieldsInstance => {
-                    this.hostedFieldsInstance = hostedFieldsInstance;
-                })
-                .catch(error => {
-                    if (typeof error.message !== 'undefined') {
-                        this.error = error;
-                    } else {
-                        this.error = "An error occurred while processing the payment.";
-                    }
-                })
-        },
-
-        /**
-         * Initialize Paypal
-         */
-        initPaypal() {
-            braintree.client.create({ authorization: process.env.VUE_APP_BRAINTREE_SANDBOX_KEY })
-                .then(function (clientInstance) {
-                return braintree.paypalCheckout.create({
-                    client: clientInstance
-                });
-            }).then(function (paypalInstance) {
-                return paypal.Button.render({
-                    env: 'sandbox',
-                    style: {
-                        label: 'paypal',
-                        size: 'responsive',
-                        shape: 'rect'
-                    },
-                    payment: () => {
-                        return paypalInstance.createPayment({
-                            flow: 'checkout',
-                            intent: 'sale',
-                            amount: 10.00,
-                            displayName: 'Braintree Testing',
-                            currency: 'USD'
-                        })
-                    },
-                    onAuthorize: (data, options) => {
-                        return paypalInstance.tokenizePayment(options)
-                            .then(response => {
-                                // this.error = "";
-                                axios.post("api/payments", {
-                                    nonce: response.nonce,
-                                    amount: 10.00,
-                                })
-                                    .then(() => {
-                                        this.success = true;
-                                    })
-                                    .catch(error => {
-                                        console.log(error);
-                                    })
-                            })
-                    },
-                    // onCancel: (data) => {
-                    //     console.log(data);
-                    //     console.log("Payment Cancelled");
-                    // },
-                    // onError: (err) => {
-                    //     console.error(err);
-                    //     this.error = "An error occurred while processing the paypal payment.";
-                    // }
-                }, '#paypal-button')
-            }).catch(function (err) {
-                console.error('Error!', err);
-            });
-        },
-
-        /**
-         * Submit payment button
-         */
-        async submitPaymentButton() {
-            this.error = null;
-
-            await this.hostedFieldsInstance.tokenize()
-                .then(response => {
-                    this.submitPayment(response);
-                })
-                .catch(error => {
-                    this.error = error;
-                })
-        },
-
-        /**
-         * Submit payment
-         */
-        async submitPayment(response) {
-            this.success = false;
-
-            await axios.post("api/payments", {
-                nonce: response.nonce,
-                amount: this.amount,
-            })
-            .then(() => {
-                this.success = true;
-            })
-            .catch(error => {
-                console.log(error);
-                this.error = error;
-            })
-        },
-    },
-    computed: {
-        isValidated() {
-            if (this.hostedFieldsInstance) {
-                return (this.cardNumber || this.expirationDate || this.cvv);
-            }
-
-            return false;
-        },
-
-        cardNumber() {
-            if (this.hostedFieldsInstance) {
-                return !this.hostedFieldsInstance._state.fields.number.isValid;
-            }
-
-            return false;
-        },
-
-        expirationDate() {
-            if (this.hostedFieldsInstance) {
-                return !this.hostedFieldsInstance._state.fields.expirationDate.isValid;
-            }
-
-            return false;
-        },
-
-        cvv() {
-            if (this.hostedFieldsInstance) {
-                return !this.hostedFieldsInstance._state.fields.cvv.isValid;
-            }
-
-            return false;
-        },
-    },
     components: {
-        SuccessAlert,
-        DangerAlert
+        Paypal,
+        CardPayment
     }
 }
 </script>
