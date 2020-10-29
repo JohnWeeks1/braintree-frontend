@@ -67,13 +67,7 @@ export default {
     },
     methods: {
         async register() {
-            await axios.get('sanctum/csrf-cookie')
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            await this.$store.dispatch('user/csrfCookie');
 
             await axios.post('api/register', {
                 first_name: this.firstName,

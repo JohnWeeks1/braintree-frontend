@@ -58,6 +58,16 @@ export default {
                 })
         },
 
+        async csrfCookie(){
+            await axios.get('sanctum/csrf-cookie')
+                .then(response => {
+                    console.log(response);
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        },
+
         async logout({commit}){
             await axios.post('api/logout')
                 .then(() => {

@@ -48,13 +48,7 @@ export default {
     },
     methods: {
         async login() {
-            await axios.get('sanctum/csrf-cookie')
-                .then(response => {
-                    console.log(response);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
+            await this.$store.dispatch('user/csrfCookie');
 
             await axios.post('api/login', {
                 email: this.email,
